@@ -59,9 +59,9 @@ public function get_isi_keranjang($id_user) {
 
  // Kosongkan keranjang setelah pesanan berhasil dibuat
  public function kosongkan_keranjang($id_user) {
-     $this->db->where('id_user', $id_user);
-     $this->db->delete('tb_keranjang');
- }
+    $this->db->where('id_user', $id_user);
+    $this->db->delete('tb_keranjang');
+}
  // Menghapus 1 item spesifik dari keranjang
  public function hapus_item_keranjang($id_keranjang) {
     $this->db->where('id_keranjang', $id_keranjang);

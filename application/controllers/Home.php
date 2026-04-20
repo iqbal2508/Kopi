@@ -5,29 +5,23 @@ class Home extends CI_Controller {
 
     public function __construct() {
         parent::__construct();
-        
-        // Jika tidak ada session ATAU yang login adalah admin, tendang ke login
-        // Ini supaya kalau kamu login admin di tab lain, tab user ini otomatis gak bisa diakses
-        if(!$this->session->userdata('id_user') || $this->session->userdata('role') != 'pelanggan') {
-            $this->session->sess_destroy(); // Hancurkan sesi yang salah
-            redirect('Auth');
-        }
+        // Memuat model yang dibutuhkan untuk semua fungsi
         $this->load->model('M_katalog');
     }
 
     public function index() {
         $id_user = $this->session->userdata('id_user'); 
         $data['title'] = "Jejak Rasa Kopi - Welcome";
-        $data['total_keranjang'] = $this->M_katalog->hitung_keranjang($id_user);
+        // Cek jika user login, hitung keranjang. Jika tidak, set 0.
+        $data['total_keranjang'] = $id_user ? $this->M_katalog->hitung_keranjang($id_user) : 0;
         $this->load->view('v_home_landing', $data);
     }
-
     public function menu() {
         $id_user = $this->session->userdata('id_user'); 
         $data['title'] = "Katalog Menu - Jejak Rasa Kopi";
         $data['promo'] = $this->M_katalog->get_promo();
         $data['produk'] = $this->M_katalog->get_produk();
-        $data['total_keranjang'] = $this->M_katalog->hitung_keranjang($id_user);
+        $data['total_keranjang'] = $id_user ? $this->M_katalog->hitung_keranjang($id_user) : 0;
         $this->load->view('v_home', $data);
     }
 
@@ -113,52 +107,51 @@ class Home extends CI_Controller {
     public function proses_pesanan() {
         $id_user = $this->session->userdata('id_user'); 
         $user = $this->M_katalog->get_user_data($id_user);
-
+    
         $tipe_pesanan = $this->input->post('tipe_pesanan');
         $metode_pembayaran = $this->input->post('metode_pembayaran');
+        $provinsi = $this->input->post('provinsi');
+        $kota = $this->input->post('kota');
+        
         $isi_keranjang = $this->M_katalog->get_isi_keranjang($id_user);
-
+    
+        // Hitung total belanja
         $total_belanja = 0;
         foreach($isi_keranjang as $item) {
             $total_belanja += ($item['harga'] * $item['qty']);
         }
-
+    
+        // Logika diskon (Kopi Gratis / Hadiah Game)
         $diskon = 0;
         $hadiah = $user['hadiah_game'];
-        
-        if($hadiah == 'Diskon 10%') {
-            $diskon = $total_belanja * 0.10;
-        } elseif($hadiah == 'Diskon 20%') {
-            $diskon = $total_belanja * 0.20;
-        } elseif($hadiah == 'Voucher 10rb') {
-            $diskon = 10000;
-        } elseif($hadiah == 'Kopi Gratis') {
-            // Tangkap produk yang dipilih user dari dropdown v_checkout
+        if($hadiah == 'Kopi Gratis') {
             $id_produk_gratis = $this->input->post('id_produk_gratis');
             foreach($isi_keranjang as $item) {
                 if($item['id_produk'] == $id_produk_gratis) {
-                    $diskon = $item['harga']; // Potong 100% harga produk tersebut
+                    $diskon = $item['harga'];
                     break;
                 }
             }
         }
-
-        if($diskon > $total_belanja) $diskon = $total_belanja;
+        // ... tambahkan logika diskon persen lainnya jika ada ...
+    
         $total_bayar_akhir = $total_belanja - $diskon;
-
-        date_default_timezone_set('Asia/Jakarta');
         $id_transaksi = 'INV-' . date('Ymd-His');
-
+    
+        // 1. Simpan Header Transaksi
         $data_transaksi = array(
             'id_transaksi' => $id_transaksi,
             'id_user' => $id_user,
+            'provinsi' => $provinsi,
+            'kota' => $kota,
             'total_bayar' => $total_bayar_akhir,
             'metode_pembayaran' => $metode_pembayaran,
             'tipe_pesanan' => $tipe_pesanan,
             'status_pesanan' => 'Menunggu Pembayaran'
         );
         $this->M_katalog->insert_transaksi($data_transaksi);
-
+    
+        // 2. Simpan Detail Transaksi & Kurangi Stok
         foreach($isi_keranjang as $item) {
             $data_detail = array(
                 'id_transaksi' => $id_transaksi,
@@ -170,19 +163,23 @@ class Home extends CI_Controller {
             $this->M_katalog->insert_detail_transaksi($data_detail);
             $this->M_katalog->kurangi_stok($item['id_produk'], $item['qty']);
         }
-
-        $this->M_katalog->kosongkan_keranjang($id_user);
-        $this->M_katalog->reset_hadiah_user($id_user); 
+    
+        // MASALAH 2: Pastikan dua baris ini ada dan modelnya benar
+        $this->M_katalog->kosongkan_keranjang($id_user); // Menghapus data di tb_keranjang
+        $this->M_katalog->reset_hadiah_user($id_user);   // Reset hadiah agar tidak bisa dipakai lagi
         
         redirect('Home/pesanan_sukses/'.$id_transaksi);
     }
-
     public function pesanan_sukses($id_transaksi = '') {
         if(empty($id_transaksi)) { redirect('Home/menu'); }
         $data['title'] = "Pesanan Berhasil - Jejak Rasa Kopi";
         $data['id_transaksi'] = $id_transaksi;
         $id_user = $this->session->userdata('id_user');
         $data['total_keranjang'] = $this->M_katalog->hitung_keranjang($id_user);
+        
+        // Ambil data transaksi berdasarkan ID Transaksi
+        $data['transaksi'] = $this->db->get_where('tb_transaksi', ['id_transaksi' => $id_transaksi])->row_array();
+        
         $this->load->view('v_sukses', $data);
     }
 
@@ -195,6 +192,11 @@ class Home extends CI_Controller {
     }
 
     public function game() {
+        if(!$this->session->userdata('id_user')) {
+            $this->session->set_flashdata('pesan', '<div class="alert alert-warning">Silakan login untuk bermain game!</div>');
+            redirect('Auth');
+        }
+        
         $id_user = $this->session->userdata('id_user'); 
         $data['title'] = "Roda Keberuntungan - Jejak Rasa Kopi";
         $data['total_keranjang'] = $this->M_katalog->hitung_keranjang($id_user);

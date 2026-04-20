@@ -102,20 +102,25 @@
 </head>
 <body>
 
-    <nav class="navbar navbar-expand-lg navbar-dark navbar-coffee fixed-top">
-        <div class="container-fluid px-4">
-            <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="<?= site_url('Home'); ?>">
-                <span style="font-size: 1.5rem;">☕</span> Jejak Rasa Kopi
-            </a>
-            <div class="d-flex align-items-center gap-3">
-                <span class="text-white opacity-75 small d-none d-md-inline">Halo, <?= $this->session->userdata('nama'); ?></span>
-                <a href="<?= site_url('Home/menu'); ?>" class="btn btn-outline-light btn-sm fw-bold">Katalog</a>
-                <a href="<?= site_url('Home/riwayat'); ?>" class="btn btn-outline-light btn-sm">Riwayat</a>
-                <a href="<?= site_url('Home/keranjang'); ?>" class="btn btn-warning btn-sm fw-bold shadow-sm">🛒 Keranjang (<?= $total_keranjang; ?>)</a>
-                <a href="<?= site_url('Auth/logout'); ?>" class="btn btn-danger btn-sm">Keluar</a>
-            </div>
-        </div>
-    </nav>
+<nav class="navbar navbar-expand-lg navbar-dark navbar-coffee fixed-top">
+    <div class="container-fluid px-4">
+        <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="<?= site_url('Home'); ?>">
+            <span style="font-size: 1.5rem;">☕</span> Jejak Rasa Kopi
+        </a>
+        <div class="d-flex align-items-center gap-3">
+    <?php if($this->session->userdata('id_user')): ?>
+        <span class="text-white opacity-75 small d-none d-md-inline">Halo, <?= $this->session->userdata('nama'); ?></span>
+        <a href="<?= site_url('Home/menu'); ?>" class="btn btn-outline-light btn-sm fw-bold">Katalog</a>
+        <a href="<?= site_url('Home/riwayat'); ?>" class="btn btn-outline-light btn-sm">Riwayat</a>
+        <a href="<?= site_url('Home/keranjang'); ?>" class="btn btn-warning btn-sm fw-bold shadow-sm">🛒 Keranjang (<?= $total_keranjang; ?>)</a>
+        <a href="<?= site_url('Auth/logout'); ?>" class="btn btn-danger btn-sm">Keluar</a>
+    <?php else: ?>
+        <a href="<?= site_url('Home/menu'); ?>" class="btn btn-outline-light btn-sm fw-bold">Katalog</a>
+        <a href="<?= site_url('Auth'); ?>" class="btn btn-primary btn-sm fw-bold shadow-sm">Masuk / Login</a>
+    <?php endif; ?>
+</div>
+    </div>
+</nav>
 
     <div class="container">
         

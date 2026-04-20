@@ -81,17 +81,55 @@
                         <div class="mb-3">
                             <label class="form-label fw-bold">Tipe Pesanan</label>
                             <select name="tipe_pesanan" class="form-select" required>
-                                <option value="Dine In">Dine In (Makan di Tempat)</option>
-                                <option value="Take Away">Take Away (Bawa Pulang)</option>
+                                <option value="Di Antar">Di Antar (Ojek / Kurir)</option>
+                                <option value="Datang ke Rumah">Datang ke Rumah (Ambil Sendiri)</option>
                             </select>
                         </div>
-                        <div class="mb-4">
+                        
+                        <div class="mb-3">
                             <label class="form-label fw-bold">Metode Pembayaran</label>
                             <select name="metode_pembayaran" class="form-select" required>
-                                <option value="Tunai/Kasir">Bayar Tunai di Kasir</option>
                                 <option value="QRIS">QRIS / E-Wallet</option>
+                                <option value="Transfer Bank">Transfer Bank</option>
+                                <option value="Bayar di Tempat">Bayar di Tempat</option>
                             </select>
                         </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Provinsi</label>
+                            <select name="provinsi" id="provinsi" class="form-select" required>
+                                <option value="">-- Pilih Provinsi --</option>
+                                <option value="DKI Jakarta">DKI Jakarta</option>
+                                <option value="Jawa Barat">Jawa Barat</option>
+                                <option value="Banten">Banten</option>
+                                <option value="Luar Jabodetabek">Lainnya (Luar Jabodetabek)</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Kota / Kabupaten</label>
+                            <select name="kota" id="kota" class="form-select" required>
+                                <option value="">-- Pilih Kota --</option>
+                                <optgroup label="DKI Jakarta">
+                                    <option value="Jakarta Barat">Jakarta Barat</option>
+                                    <option value="Jakarta Pusat">Jakarta Pusat</option>
+                                    <option value="Jakarta Selatan">Jakarta Selatan</option>
+                                    <option value="Jakarta Timur">Jakarta Timur</option>
+                                    <option value="Jakarta Utara">Jakarta Utara</option>
+                                </optgroup>
+                                <optgroup label="Bodetabek">
+                                    <option value="Bogor">Bogor</option>
+                                    <option value="Depok">Depok</option>
+                                    <option value="Tangerang">Tangerang</option>
+                                    <option value="Tangerang Selatan">Tangerang Selatan</option>
+                                    <option value="Bekasi">Bekasi</option>
+                                </optgroup>
+                                <optgroup label="Lainnya">
+                                    <option value="Luar Jangkauan">Luar Jangkauan</option>
+                                </optgroup>
+                            </select>
+                        </div>
+
                         <button type="submit" class="btn w-100 fw-bold py-3 text-white" style="background-color: #6F4E37; border-radius: 10px;">
                             Pesan & Bayar Sekarang
                         </button>
@@ -100,6 +138,43 @@
             </div>
         </div>
     </div>
+
+    <script>
+const formCheckout = document.querySelector('form'); 
+
+formCheckout.addEventListener('submit', function(e) {
+    // Ambil semua nilai input
+    let prov = document.getElementById('provinsi').value;
+    let kota = document.getElementById('kota').value;
+    let tipePesanan = document.querySelector('select[name="tipe_pesanan"]').value;
+    let metodePembayaran = document.querySelector('select[name="metode_pembayaran"]').value;
+    let totalBelanja = <?= isset($total_belanja) ? $total_belanja : 0; ?>; 
+    
+    let kotaBodetabek = ['Bogor', 'Depok', 'Tangerang', 'Tangerang Selatan', 'Bekasi'];
+
+    // MASALAH 1: Validasi Ojek/Kurir tidak boleh Bayar di Tempat
+    if (tipePesanan === 'Di Antar' && metodePembayaran === 'Bayar di Tempat') {
+        e.preventDefault(); // Batalkan kirim form
+        alert('Maaf, pesanan yang di antar menggunakan ojek/kurir wajib dibayar di awal (QRIS/Transfer). Bayar di tempat hanya berlaku jika Anda datang ke rumah.');
+        return; // Berhenti di sini
+    }
+
+    // Validasi Lokasi & Minimal Order (DKI Jakarta vs Bodetabek)
+    if (prov !== 'DKI Jakarta') {
+        if (kotaBodetabek.includes(kota)) {
+            // Jika Bodetabek (Bogor, Bekasi, Tangerang, dll), minimal 30rb
+            if (totalBelanja < 30000) {
+                e.preventDefault();
+                alert('Minimal pesanan untuk area luar Jakarta (Bodetabek) adalah Rp 30.000!');
+            }
+        } else {
+            // Jika di luar Jabodetabek sama sekali
+            e.preventDefault();
+            alert('Maaf, alamat Anda di luar jangkauan pengiriman kami.');
+        }
+    }
+});
+</script>
 
     <script>
         const selectGratis = document.getElementById('kopiGratisSelect');
