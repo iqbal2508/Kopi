@@ -125,4 +125,5 @@ public function kurangi_jatah_10detik($id_user) {
     $this->db->where('id_user', $id_user);
     $this->db->update('tb_users');
 }
+
 } // <-- Pastikan kurung kurawal penutup class ini ada di paling bawah

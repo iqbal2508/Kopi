@@ -91,6 +91,7 @@
                 <a href="<?= site_url('Admin/users'); ?>" class="btn btn-outline-light btn-sm rounded-pill px-3">👥 Kelola User</a>
                 <a href="<?= site_url('Admin/produk'); ?>" class="btn btn-outline-light btn-sm rounded-pill px-3">📦 Kelola Menu</a>
                 <a href="<?= site_url('Admin/laporan'); ?>" class="btn btn-outline-light btn-sm rounded-pill px-3">📊 Laporan</a>
+                <a href="<?= site_url('Admin/pendapatan'); ?>" class="btn btn-outline-light btn-sm rounded-pill px-3">Pendapatan</a>
                 
                 <div class="border-start border-secondary mx-2" style="height: 24px;"></div>
                 

@@ -224,4 +224,109 @@ class Admin extends CI_Controller {
         if(empty($data['transaksi'])) { redirect('Admin'); }
         $this->load->view('v_admin_detail', $data);
     }
+   // Menampilkan Halaman Form Input Keuangan
+   public function pendapatan() {
+    if($this->session->userdata('role') != 'admin') {
+        redirect('Auth');
+    }
+
+    $data['title'] = "Hitung Laba/Rugi - Admin Jejak Rasa";
+    $data['riwayat'] = $this->M_admin->get_riwayat_keuangan(); // Panggil data dari tabel
+
+    $this->load->view('v_admin_pendapatan', $data);
+}
+
+// Proses Menghitung dan Menyimpan ke Database
+public function simpan_keuangan() {
+    if($this->session->userdata('role') != 'admin') {
+        redirect('Auth');
+    }
+
+    $bulan = $this->input->post('bulan');
+    $modal = $this->input->post('modal');
+    $pendapatan = $this->input->post('pendapatan');
+    
+    // Logika Menghitung Laba / Rugi
+    $laba_rugi = $pendapatan - $modal;
+
+    $data = array(
+        'bulan'      => $bulan,
+        'modal'      => $modal,
+        'pendapatan' => $pendapatan,
+        'laba_rugi'  => $laba_rugi
+    );
+
+    $this->M_admin->simpan_keuangan($data);
+    $this->session->set_flashdata('pesan', '<div class="alert alert-success fw-bold">Berhasil! Data keuangan bulan '.$bulan.' telah disimpan.</div>');
+    
+    redirect('Admin/pendapatan');
+}
+// --- FITUR EDIT & HAPUS PENDAPATAN ---
+public function hapus_keuangan($id) {
+    $this->M_admin->hapus_keuangan($id);
+    $this->session->set_flashdata('pesan', '<div class="alert alert-success">Data berhasil dihapus!</div>');
+    redirect('Admin/pendapatan');
+}
+
+public function edit_keuangan() {
+    $id = $this->input->post('id_keuangan');
+    $data = array(
+        'bulan' => $this->input->post('bulan'),
+        'modal' => $this->input->post('modal'),
+        'pendapatan' => $this->input->post('pendapatan'),
+        'laba_rugi' => $this->input->post('pendapatan') - $this->input->post('modal')
+    );
+    $this->M_admin->edit_keuangan($id, $data);
+    $this->session->set_flashdata('pesan', '<div class="alert alert-success">Data berhasil diubah!</div>');
+    redirect('Admin/pendapatan');
+}
+
+// --- FITUR AUTO-FETCH (AJAX) ---
+public function get_data_sistem() {
+    $bulan = $this->input->post('bulan');
+    $modal = $this->M_admin->get_total_pengeluaran_bulan($bulan);
+    $pendapatan = $this->M_admin->get_total_pendapatan_bulan($bulan);
+    
+    echo json_encode(array(
+        'modal' => $modal,
+        'pendapatan' => $pendapatan
+    ));
+}
+
+// --- HALAMAN CATATAN BELANJA (PENGELUARAN) ---
+public function belanja() {
+    if($this->session->userdata('role') != 'admin') { redirect('Auth'); }
+    $data['title'] = "Catatan Belanja Bahan - Admin";
+    $data['pengeluaran'] = $this->M_admin->get_pengeluaran();
+    $this->load->view('v_admin_pengeluaran', $data);
+}
+
+public function simpan_belanja() {
+    $data = array(
+        'tanggal' => $this->input->post('tanggal'),
+        'nama_barang' => $this->input->post('nama_barang'),
+        'harga' => $this->input->post('harga')
+    );
+    $this->M_admin->simpan_pengeluaran($data);
+    $this->session->set_flashdata('pesan', '<div class="alert alert-success">Catatan belanja berhasil ditambahkan!</div>');
+    redirect('Admin/belanja');
+}
+
+public function hapus_belanja($id) {
+    $this->M_admin->hapus_pengeluaran($id);
+    $this->session->set_flashdata('pesan', '<div class="alert alert-success">Catatan berhasil dihapus!</div>');
+    redirect('Admin/belanja');
+}
+
+public function edit_belanja() {
+    $id = $this->input->post('id_pengeluaran');
+    $data = array(
+        'tanggal' => $this->input->post('tanggal'),
+        'nama_barang' => $this->input->post('nama_barang'),
+        'harga' => $this->input->post('harga')
+    );
+    $this->M_admin->edit_pengeluaran($id, $data);
+    $this->session->set_flashdata('pesan', '<div class="alert alert-success">Catatan berhasil diubah!</div>');
+    redirect('Admin/belanja');
+}
 }

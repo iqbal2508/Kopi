@@ -113,4 +113,59 @@ public function update_produk($id_produk, $data) {
     $this->db->where('id_produk', $id_produk);
     $this->db->update('tb_produk', $data);
 }
+// Fungsi untuk menyimpan data inputan manual
+public function simpan_keuangan($data) {
+    return $this->db->insert('tb_keuangan', $data);
+}
+
+// Fungsi untuk memanggil riwayat pembukuan dari yang terbaru
+public function get_riwayat_keuangan() {
+    $this->db->order_by('waktu_input', 'DESC');
+    return $this->db->get('tb_keuangan')->result_array();
+}
+// --- FUNGSI HALAMAN PENDAPATAN (TAMBAHAN EDIT & HAPUS) ---
+public function hapus_keuangan($id) {
+    return $this->db->delete('tb_keuangan', ['id_keuangan' => $id]);
+}
+public function edit_keuangan($id, $data) {
+    $this->db->where('id_keuangan', $id);
+    return $this->db->update('tb_keuangan', $data);
+}
+
+// --- FUNGSI HALAMAN CATATAN BELANJA (BARANG DIBELI) ---
+public function get_pengeluaran() {
+    $this->db->order_by('tanggal', 'DESC');
+    return $this->db->get('tb_pengeluaran')->result_array();
+}
+public function simpan_pengeluaran($data) {
+    return $this->db->insert('tb_pengeluaran', $data);
+}
+public function hapus_pengeluaran($id) {
+    return $this->db->delete('tb_pengeluaran', ['id_pengeluaran' => $id]);
+}
+public function edit_pengeluaran($id, $data) {
+    $this->db->where('id_pengeluaran', $id);
+    return $this->db->update('tb_pengeluaran', $data);
+}
+
+// --- FUNGSI TARIK DATA OTOMATIS ---
+public function get_total_pengeluaran_bulan($bulan) {
+    // $bulan formatnya "YYYY-MM" (Contoh: 2026-04)
+    $this->db->select_sum('harga');
+    $this->db->like('tanggal', $bulan, 'after');
+    $hasil = $this->db->get('tb_pengeluaran')->row_array();
+    return $hasil['harga'] ? $hasil['harga'] : 0;
+}
+
+public function get_total_pendapatan_bulan($bulan) {
+    // Karena ID transaksi Anda formatnya INV-YYYYMMDD-HHmmss
+    $bulan_format = str_replace('-', '', $bulan); // Ubah 2026-04 jadi 202604
+    
+    $this->db->select_sum('total_bayar');
+    $this->db->like('id_transaksi', 'INV-' . $bulan_format, 'after');
+    // Hanya hitung yang sudah dibayar (abaikan yang menunggu pembayaran)
+    $this->db->where('status_pesanan !=', 'Menunggu Pembayaran'); 
+    $hasil = $this->db->get('tb_transaksi')->row_array();
+    return $hasil['total_bayar'] ? $hasil['total_bayar'] : 0;
+}
 }
