@@ -34,6 +34,13 @@ class Home extends CI_Controller {
 
     public function tambah_keranjang($id_produk) {
         $id_user = $this->session->userdata('id_user');
+
+        // --- TAMBAHKAN PENGECEKAN LOGIN ---
+        if (!$id_user) {
+            $this->session->set_flashdata('pesan', '<div class="alert alert-warning fw-bold text-center">Silakan login terlebih dahulu untuk memesan kopi!</div>');
+            redirect('Auth');
+        }
+
         $cek = $this->M_katalog->cek_keranjang($id_user, $id_produk);
         if($cek) {
             $qty_baru = $cek['qty'] + 1;
@@ -212,6 +219,10 @@ class Home extends CI_Controller {
     }
 
     public function kupon() {
+        if(!$this->session->userdata('id_user')) {
+            $this->session->set_flashdata('pesan', '<div class="alert alert-warning">Silakan login untuk melihat kupon!</div>');
+            redirect('Auth');
+        }
         $id_user = $this->session->userdata('id_user'); 
         $data['title'] = "Kumpulkan Kupon - Jejak Rasa Kopi";
         $data['total_keranjang'] = $this->M_katalog->hitung_keranjang($id_user);
@@ -226,6 +237,10 @@ class Home extends CI_Controller {
         redirect('Home/kupon');
     }
     public function challenge_10s() {
+        if(!$this->session->userdata('id_user')) {
+            $this->session->set_flashdata('pesan', '<div class="alert alert-warning">Silakan login untuk bermain challenge!</div>');
+            redirect('Auth');
+        }
         $id_user = $this->session->userdata('id_user'); 
         $data['title'] = "10-Second Challenge - Jejak Rasa Kopi";
         $data['total_keranjang'] = $this->M_katalog->hitung_keranjang($id_user);

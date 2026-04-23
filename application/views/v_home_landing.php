@@ -194,9 +194,15 @@
                         </a>
                     </li>
 
-                    <li class="nav-item ms-2">
-                        <a href="<?= site_url('Auth/logout'); ?>" class="btn btn-outline-danger btn-sm px-3" style="border-radius:0;">Logout</a>
-                    </li>
+                    <div class="d-flex align-items-center gap-3">
+    <?php if($this->session->userdata('id_user')): ?>
+        
+        <a href="<?= site_url('Auth/logout'); ?>" class="btn btn-danger btn-sm fw-bold">Logout</a>
+    <?php else: ?>
+        
+        <a href="<?= site_url('Auth'); ?>" class="btn btn-primary btn-sm fw-bold shadow-sm">Login</a>
+    <?php endif; ?>
+</div>
                 </ul>
             </div>
         </div>
