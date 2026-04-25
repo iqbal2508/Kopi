@@ -43,17 +43,15 @@
                             <strong>Rp <?= number_format($total_belanja, 0, ',', '.'); ?></strong>
                         </div>
                         
-                        <?php if($diskon > 0): ?>
-                        <div class="d-flex justify-content-between text-success mb-2">
-                            <span>🎁 Promo Dipakai (<?= $user['hadiah_game']; ?>)</span>
-                            <strong id="teksDiskon">- Rp <?= number_format($diskon, 0, ',', '.'); ?></strong>
+                        <div class="d-flex justify-content-between text-success mb-2" id="barisDiskon" style="display: none !important;">
+                            <span id="labelDiskon">🎁 Promo Dipakai</span>
+                            <strong id="teksDiskon">- Rp 0</strong>
                         </div>
-                        <?php endif; ?>
 
                         <hr>
                         <div class="d-flex justify-content-between align-items-center">
                             <span class="fs-5 fw-bold" style="color: #4A2C2A;">Total Pembayaran</span>
-                            <h3 class="fw-bold mb-0" style="color: #D25345;" id="teksTotal">Rp <?= number_format($total_akhir, 0, ',', '.'); ?></h3>
+                            <h3 class="fw-bold mb-0" style="color: #D25345;" id="teksTotal">Rp <?= number_format($total_belanja, 0, ',', '.'); ?></h3>
                         </div>
                     </div>
                 </div>
@@ -64,8 +62,28 @@
                     <h4 class="fw-bold mb-4" style="color: #4A2C2A;">Selesaikan Pesanan</h4>
                     <form action="<?= site_url('Home/proses_pesanan'); ?>" method="POST">
                         
-                        <?php if($user['hadiah_game'] == 'Kopi Gratis'): ?>
-                        <div class="mb-4 p-3 rounded" style="background-color: #e8f5e9; border: 1px solid #81c784;">
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-warning" style="color: #C08261 !important;">🏷️ Pilih Promo Anda</label>
+                            <select class="form-select border-warning" id="pilihVoucher" name="id_voucher" style="background-color: #fffaf0;">
+                                <option value="0">--- Lanjut Tanpa Promo ---</option>
+
+                                <?php if(!empty($user['hadiah_game']) && $user['hadiah_game'] != 'Zonk!'): ?>
+                                    <option value="game_<?= $user['hadiah_game'] ?>">🎡 Game: <?= $user['hadiah_game'] ?></option>
+                                <?php endif; ?>
+
+                                <?php if($user['login_streak'] >= 1): ?>
+                                    <option value="5">📅 Absen: Diskon 5%</option>
+                                <?php endif; ?>
+                                <?php if($user['login_streak'] >= 4): ?>
+                                    <option value="10">📅 Absen: Diskon 10%</option>
+                                <?php endif; ?>
+                                <?php if($user['login_streak'] >= 7): ?>
+                                    <option value="free">📅 Absen: 1 Kopi Gratis</option>
+                                <?php endif; ?>
+                            </select>
+                        </div>
+
+                        <div id="wadahKopiGratis" class="mb-4 p-3 rounded d-none" style="background-color: #e8f5e9; border: 1px solid #81c784;">
                             <label class="form-label fw-bold text-success">🎉 Pilih 1 Kopi yang Digratiskan</label>
                             <select name="id_produk_gratis" id="kopiGratisSelect" class="form-select border-success">
                                 <?php foreach($isi_keranjang as $item): ?>
@@ -76,7 +94,6 @@
                             </select>
                             <small class="text-success mt-1 d-block">*Diskon memotong harga 1 cup kopi pilihanmu.</small>
                         </div>
-                        <?php endif; ?>
 
                         <div class="mb-3">
                             <label class="form-label fw-bold">Tipe Pesanan</label>
@@ -140,62 +157,109 @@
     </div>
 
     <script>
-const formCheckout = document.querySelector('form'); 
+        const formCheckout = document.querySelector('form'); 
 
-formCheckout.addEventListener('submit', function(e) {
-    // Ambil semua nilai input
-    let prov = document.getElementById('provinsi').value;
-    let kota = document.getElementById('kota').value;
-    let tipePesanan = document.querySelector('select[name="tipe_pesanan"]').value;
-    let metodePembayaran = document.querySelector('select[name="metode_pembayaran"]').value;
-    let totalBelanja = <?= isset($total_belanja) ? $total_belanja : 0; ?>; 
-    
-    let kotaBodetabek = ['Bogor', 'Depok', 'Tangerang', 'Tangerang Selatan', 'Bekasi'];
+        formCheckout.addEventListener('submit', function(e) {
+            let prov = document.getElementById('provinsi').value;
+            let kota = document.getElementById('kota').value;
+            let tipePesanan = document.querySelector('select[name="tipe_pesanan"]').value;
+            let metodePembayaran = document.querySelector('select[name="metode_pembayaran"]').value;
+            let totalBelanja = <?= isset($total_belanja) ? $total_belanja : 0; ?>; 
+            
+            let kotaBodetabek = ['Bogor', 'Depok', 'Tangerang', 'Tangerang Selatan', 'Bekasi'];
 
-    // MASALAH 1: Validasi Ojek/Kurir tidak boleh Bayar di Tempat
-    if (tipePesanan === 'Di Antar' && metodePembayaran === 'Bayar di Tempat') {
-        e.preventDefault(); // Batalkan kirim form
-        alert('Maaf, pesanan yang di antar menggunakan ojek/kurir wajib dibayar di awal (QRIS/Transfer). Bayar di tempat hanya berlaku jika Anda datang ke rumah.');
-        return; // Berhenti di sini
-    }
-
-    // Validasi Lokasi & Minimal Order (DKI Jakarta vs Bodetabek)
-    if (prov !== 'DKI Jakarta') {
-        if (kotaBodetabek.includes(kota)) {
-            // Jika Bodetabek (Bogor, Bekasi, Tangerang, dll), minimal 30rb
-            if (totalBelanja < 30000) {
-                e.preventDefault();
-                alert('Minimal pesanan untuk area luar Jakarta (Bodetabek) adalah Rp 30.000!');
+            if (tipePesanan === 'Di Antar' && metodePembayaran === 'Bayar di Tempat') {
+                e.preventDefault(); 
+                alert('Maaf, pesanan yang di antar menggunakan ojek/kurir wajib dibayar di awal (QRIS/Transfer). Bayar di tempat hanya berlaku jika Anda datang ke rumah.');
+                return; 
             }
-        } else {
-            // Jika di luar Jabodetabek sama sekali
-            e.preventDefault();
-            alert('Maaf, alamat Anda di luar jangkauan pengiriman kami.');
-        }
-    }
-});
-</script>
+
+            if (prov !== 'DKI Jakarta') {
+                if (kotaBodetabek.includes(kota)) {
+                    if (totalBelanja < 30000) {
+                        e.preventDefault();
+                        alert('Minimal pesanan untuk area luar Jakarta (Bodetabek) adalah Rp 30.000!');
+                    }
+                } else {
+                    e.preventDefault();
+                    alert('Maaf, alamat Anda di luar jangkauan pengiriman kami.');
+                }
+            }
+        });
+    </script>
 
     <script>
-        const selectGratis = document.getElementById('kopiGratisSelect');
+        const pilihVoucher = document.getElementById('pilihVoucher');
+        const wadahKopiGratis = document.getElementById('wadahKopiGratis');
+        const kopiGratisSelect = document.getElementById('kopiGratisSelect');
+        const barisDiskon = document.getElementById('barisDiskon');
+        const labelDiskon = document.getElementById('labelDiskon');
         const teksDiskon = document.getElementById('teksDiskon');
         const teksTotal = document.getElementById('teksTotal');
-        const subtotal = <?= $total_belanja; ?>;
+        
+        let totalAwal = <?= isset($total_belanja) ? $total_belanja : 0; ?>;
 
-        if (selectGratis) {
-            selectGratis.addEventListener('change', function() {
-                // Ambil harga dari kopi yang dipilih
-                const hargaDiskon = parseInt(this.options[this.selectedIndex].getAttribute('data-harga'));
+        function hitungDiskonVoucher() {
+            let tipe = pilihVoucher.value;
+            let diskon = 0;
+            let namaPromo = "";
+
+            // Sembunyikan pilihan kopi gratis by default
+            wadahKopiGratis.classList.add('d-none');
+
+            if(tipe === "5") {
+                diskon = totalAwal * 0.05;
+                namaPromo = "Diskon 5% (Absen)";
+            } else if(tipe === "10") {
+                diskon = totalAwal * 0.10;
+                namaPromo = "Diskon 10% (Absen)";
+            } else if(tipe === "game_Diskon 10%") {
+                diskon = totalAwal * 0.10;
+                namaPromo = "Diskon 10% (Game)";
+            } else if(tipe === "game_Diskon 20%") {
+                diskon = totalAwal * 0.20;
+                namaPromo = "Diskon 20% (Game)";
+            } else if(tipe === "game_Voucher 10rb") {
+                diskon = 10000;
+                namaPromo = "Potongan 10Rb (Game)";
+            } else if(tipe === "free" || tipe === "game_Kopi Gratis") {
+                // Munculkan kembali wadah pilihan kopi jika jenis vouchernya "Gratis"
+                wadahKopiGratis.classList.remove('d-none');
+                namaPromo = "1 Kopi Gratis";
                 
-                // Hitung total baru
-                let totalAkhir = subtotal - hargaDiskon;
-                if(totalAkhir < 0) totalAkhir = 0;
+                // Ambil harga dari kopi yang sedang dipilih di dropdown kedua
+                if(kopiGratisSelect && kopiGratisSelect.options.length > 0) {
+                    diskon = parseInt(kopiGratisSelect.options[kopiGratisSelect.selectedIndex].getAttribute('data-harga'));
+                }
+            }
 
-                // Update tampilan (Ubah format angka jadi Rupiah)
-                teksDiskon.innerText = "- Rp " + hargaDiskon.toLocaleString('id-ID');
-                teksTotal.innerText = "Rp " + totalAkhir.toLocaleString('id-ID');
-            });
+            // Cegah agar diskon tidak membuat harga minus
+            if(diskon > totalAwal) diskon = totalAwal;
+            
+            let totalAkhir = totalAwal - diskon;
+
+            // Update UI Interface
+            if(diskon > 0) {
+                barisDiskon.style.setProperty('display', 'flex', 'important');
+                labelDiskon.innerText = "🎁 " + namaPromo;
+                teksDiskon.innerText = "- Rp " + diskon.toLocaleString('id-ID');
+            } else {
+                barisDiskon.style.setProperty('display', 'none', 'important');
+            }
+
+            teksTotal.innerText = "Rp " + totalAkhir.toLocaleString('id-ID');
         }
+
+        // Jalankan fungsi ketika opsi voucher diganti
+        pilihVoucher.addEventListener('change', hitungDiskonVoucher);
+        
+        // Jalankan fungsi ketika kopi gratis yang dipilih diganti (agar harga potongan update)
+        if(kopiGratisSelect) {
+            kopiGratisSelect.addEventListener('change', hitungDiskonVoucher);
+        }
+
+        // Panggil 1 kali saat pertama kali load, agar total pembayaran muncul.
+        hitungDiskonVoucher();
     </script>
 
 </body>

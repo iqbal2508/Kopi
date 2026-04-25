@@ -179,10 +179,14 @@
                             Rewards & Games
                         </a>
                         <ul class="dropdown-menu shadow">
-                            <li><a class="dropdown-item" href="<?= site_url('Home/game'); ?>">🎡 Spin the Wheel</a></li>
-                            <li><a class="dropdown-item" href="<?= site_url('Home/kupon'); ?>">🎟️ Kumpulkan Kupon</a></li>
-                            <li><a class="dropdown-item" href="<?= site_url('Home/challenge_10s'); ?>">⏱️ 10s Challenge</a></li>
-                        </ul>
+    <li><a class="dropdown-item" href="<?= site_url('Home/game'); ?>">🎡 Spin the Wheel</a></li>
+    <li><a class="dropdown-item" href="<?= site_url('Home/kupon'); ?>">🎟️ Kumpulkan Kupon</a></li>
+    <li><a class="dropdown-item" href="<?= site_url('Home/challenge_10s'); ?>">⏱️ 10s Challenge</a></li>
+    
+    <li><hr class="dropdown-divider"></li> 
+    
+    <li><a class="dropdown-item" href="<?= site_url('Home/absensi'); ?>">📅 Absensi Ngopi</a></li>
+</ul>
                     </li>
 
                     <li class="nav-item"><a class="nav-link" href="<?= site_url('Home/riwayat'); ?>">Riwayat</a></li>

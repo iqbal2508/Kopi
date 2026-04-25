@@ -71,112 +71,125 @@ class Home extends CI_Controller {
     }
 
     // --- LOGIKA CHECKOUT DENGAN PEMILIHAN KOPI GRATIS ---
-    public function checkout() {
-        $id_user = $this->session->userdata('id_user'); 
-        $data['title'] = "Checkout Pesanan - Jejak Rasa Kopi";
-        $data['isi_keranjang'] = $this->M_katalog->get_isi_keranjang($id_user);
-        $data['total_keranjang'] = $this->M_katalog->hitung_keranjang($id_user);
-        $data['user'] = $this->M_katalog->get_user_data($id_user); 
+   // --- LOGIKA CHECKOUT DENGAN PEMILIHAN PROMO DINAMIS ---
+   public function checkout() {
+    $id_user = $this->session->userdata('id_user'); 
+    $data['title'] = "Checkout Pesanan - Jejak Rasa Kopi";
+    $data['isi_keranjang'] = $this->M_katalog->get_isi_keranjang($id_user);
+    $data['total_keranjang'] = $this->M_katalog->hitung_keranjang($id_user);
+    $data['user'] = $this->M_katalog->get_user_data($id_user); 
 
-        if(empty($data['isi_keranjang'])) {
-            redirect('Home/menu');
-        }
-
-        $total_belanja = 0;
-        foreach($data['isi_keranjang'] as $item) {
-            $total_belanja += ($item['harga'] * $item['qty']);
-        }
-        $data['total_belanja'] = $total_belanja;
-
-        $diskon = 0;
-        $hadiah = $data['user']['hadiah_game'];
-
-        if($hadiah == 'Diskon 10%') {
-            $diskon = $total_belanja * 0.10;
-        } elseif($hadiah == 'Diskon 20%') {
-            $diskon = $total_belanja * 0.20;
-        } elseif($hadiah == 'Voucher 10rb') {
-            $diskon = 10000;
-        } elseif($hadiah == 'Kopi Gratis') {
-            // Default diskon di layar: ambil harga item pertama di keranjang
-            $diskon = $data['isi_keranjang'][0]['harga']; 
-        }
-
-        if($diskon > $total_belanja) $diskon = $total_belanja;
-
-        $data['diskon'] = $diskon;
-        $data['total_akhir'] = $total_belanja - $diskon;
-
-        $this->load->view('v_checkout', $data);
+    if(empty($data['isi_keranjang'])) {
+        redirect('Home/menu');
     }
+
+    $total_belanja = 0;
+    foreach($data['isi_keranjang'] as $item) {
+        $total_belanja += ($item['harga'] * $item['qty']);
+    }
+    
+    $data['total_belanja'] = $total_belanja;
+    
+    // Tambahkan ini agar bisa dibaca oleh Javascript di View
+    $data['total_awal'] = $total_belanja; 
+
+    // Logika diskon PHP lama dihapus karena sudah di-handle oleh Javascript di form checkout
+    $this->load->view('v_checkout', $data);
+}
 
     // --- LOGIKA PROSES PESANAN (FIX KOPI GRATIS) ---
-    public function proses_pesanan() {
-        $id_user = $this->session->userdata('id_user'); 
-        $user = $this->M_katalog->get_user_data($id_user);
+  // --- LOGIKA PROSES PESANAN (MENDUKUNG VOUCHER GAME & ABSENSI) ---
+  public function proses_pesanan() {
+    $id_user = $this->session->userdata('id_user'); 
+    $user = $this->M_katalog->get_user_data($id_user);
+
+    $tipe_pesanan = $this->input->post('tipe_pesanan');
+    $metode_pembayaran = $this->input->post('metode_pembayaran');
+    $provinsi = $this->input->post('provinsi');
+    $kota = $this->input->post('kota');
     
-        $tipe_pesanan = $this->input->post('tipe_pesanan');
-        $metode_pembayaran = $this->input->post('metode_pembayaran');
-        $provinsi = $this->input->post('provinsi');
-        $kota = $this->input->post('kota');
-        
-        $isi_keranjang = $this->M_katalog->get_isi_keranjang($id_user);
+    // Tangkap id_voucher dari Dropdown di halaman checkout
+    $id_voucher = $this->input->post('id_voucher'); 
     
-        // Hitung total belanja
-        $total_belanja = 0;
+    $isi_keranjang = $this->M_katalog->get_isi_keranjang($id_user);
+
+    // Hitung total belanja dasar
+    $total_belanja = 0;
+    foreach($isi_keranjang as $item) {
+        $total_belanja += ($item['harga'] * $item['qty']);
+    }
+
+    // Logika Eksekusi Diskon Berdasarkan Pilihan Dropdown
+    $diskon = 0;
+    
+    if ($id_voucher == '5') {
+        $diskon = $total_belanja * 0.05;
+    } elseif ($id_voucher == '10') {
+        $diskon = $total_belanja * 0.10;
+    } elseif ($id_voucher == 'game_Diskon 10%') {
+        $diskon = $total_belanja * 0.10;
+    } elseif ($id_voucher == 'game_Diskon 20%') {
+        $diskon = $total_belanja * 0.20;
+    } elseif ($id_voucher == 'game_Voucher 10rb') {
+        $diskon = 10000;
+    } elseif ($id_voucher == 'free' || $id_voucher == 'game_Kopi Gratis') {
+        // Jika pilih Kopi Gratis, potong seharga produk yang dipilih
+        $id_produk_gratis = $this->input->post('id_produk_gratis');
         foreach($isi_keranjang as $item) {
-            $total_belanja += ($item['harga'] * $item['qty']);
-        }
-    
-        // Logika diskon (Kopi Gratis / Hadiah Game)
-        $diskon = 0;
-        $hadiah = $user['hadiah_game'];
-        if($hadiah == 'Kopi Gratis') {
-            $id_produk_gratis = $this->input->post('id_produk_gratis');
-            foreach($isi_keranjang as $item) {
-                if($item['id_produk'] == $id_produk_gratis) {
-                    $diskon = $item['harga'];
-                    break;
-                }
+            if($item['id_produk'] == $id_produk_gratis) {
+                $diskon = $item['harga'];
+                break;
             }
         }
-        // ... tambahkan logika diskon persen lainnya jika ada ...
-    
-        $total_bayar_akhir = $total_belanja - $diskon;
-        $id_transaksi = 'INV-' . date('Ymd-His');
-    
-        // 1. Simpan Header Transaksi
-        $data_transaksi = array(
-            'id_transaksi' => $id_transaksi,
-            'id_user' => $id_user,
-            'provinsi' => $provinsi,
-            'kota' => $kota,
-            'total_bayar' => $total_bayar_akhir,
-            'metode_pembayaran' => $metode_pembayaran,
-            'tipe_pesanan' => $tipe_pesanan,
-            'status_pesanan' => 'Menunggu Pembayaran'
-        );
-        $this->M_katalog->insert_transaksi($data_transaksi);
-    
-        // 2. Simpan Detail Transaksi & Kurangi Stok
-        foreach($isi_keranjang as $item) {
-            $data_detail = array(
-                'id_transaksi' => $id_transaksi,
-                'id_produk' => $item['id_produk'],
-                'qty' => $item['qty'],
-                'harga_satuan' => $item['harga'],
-                'subtotal' => $item['harga'] * $item['qty']
-            );
-            $this->M_katalog->insert_detail_transaksi($data_detail);
-            $this->M_katalog->kurangi_stok($item['id_produk'], $item['qty']);
-        }
-    
-        // MASALAH 2: Pastikan dua baris ini ada dan modelnya benar
-        $this->M_katalog->kosongkan_keranjang($id_user); // Menghapus data di tb_keranjang
-        $this->M_katalog->reset_hadiah_user($id_user);   // Reset hadiah agar tidak bisa dipakai lagi
-        
-        redirect('Home/pesanan_sukses/'.$id_transaksi);
     }
+
+    // Mencegah diskon membuat total bayar jadi minus
+    if($diskon > $total_belanja) $diskon = $total_belanja;
+    
+    $total_bayar_akhir = $total_belanja - $diskon;
+    $id_transaksi = 'INV-' . date('Ymd-His');
+
+    // 1. Simpan Header Transaksi
+    $data_transaksi = array(
+        'id_transaksi' => $id_transaksi,
+        'id_user' => $id_user,
+        'provinsi' => $provinsi,
+        'kota' => $kota,
+        'total_bayar' => $total_bayar_akhir,
+        'metode_pembayaran' => $metode_pembayaran,
+        'tipe_pesanan' => $tipe_pesanan,
+        'status_pesanan' => 'Menunggu Pembayaran'
+    );
+    $this->M_katalog->insert_transaksi($data_transaksi);
+
+    // 2. Simpan Detail Transaksi & Kurangi Stok
+    foreach($isi_keranjang as $item) {
+        $data_detail = array(
+            'id_transaksi' => $id_transaksi,
+            'id_produk' => $item['id_produk'],
+            'qty' => $item['qty'],
+            'harga_satuan' => $item['harga'],
+            'subtotal' => $item['harga'] * $item['qty']
+        );
+        $this->M_katalog->insert_detail_transaksi($data_detail);
+        $this->M_katalog->kurangi_stok($item['id_produk'], $item['qty']);
+    }
+
+    // 3. Bersihkan Keranjang
+    $this->M_katalog->kosongkan_keranjang($id_user); 
+    
+    // 4. Hapus Hadiah / Reset Streak (Agar tidak bisa dipakai berulang kali)
+    if (strpos($id_voucher, 'game_') !== false) {
+        // Jika yang dipakai adalah hadiah dari game Spin
+        $this->M_katalog->reset_hadiah_user($id_user);   
+    } elseif ($id_voucher == '5' || $id_voucher == '10' || $id_voucher == 'free') {
+        // Jika SALAH SATU hadiah absensi dipakai (5%, 10%, atau Gratis)
+        // Reset absennya ke 0 agar mulai dari awal lagi besok
+        $this->db->update('tb_users', ['login_streak' => 0], ['id_user' => $id_user]);
+    }
+    
+    redirect('Home/pesanan_sukses/'.$id_transaksi);
+}
     public function pesanan_sukses($id_transaksi = '') {
         if(empty($id_transaksi)) { redirect('Home/menu'); }
         $data['title'] = "Pesanan Berhasil - Jejak Rasa Kopi";
@@ -260,4 +273,78 @@ class Home extends CI_Controller {
         $this->M_katalog->kurangi_jatah_10detik($id_user);
         echo json_encode(['status' => 'jatah_dikurangi']);
     }
+    public function absensi()
+{
+    // Cek apakah ada data user di session (bisa 'email' atau 'id_user')
+    if (!$this->session->userdata('id_user') && !$this->session->userdata('email')) {
+        $this->session->set_flashdata('pesan', '<div class="alert alert-danger">Sesi berakhir, silakan login kembali.</div>');
+        redirect('Auth'); 
+        return;
+    }
+
+    $data['title'] = "Daily Check-in | Jejak Rasa";
+    
+    // Gunakan id_user untuk mengambil data agar lebih akurat
+    $id_user = $this->session->userdata('id_user');
+    $data['user'] = $this->db->get_where('tb_users', ['id_user' => $id_user])->row_array();
+    
+    if (!$data['user']) {
+        redirect('Auth'); 
+        return;
+    }
+    
+    $this->load->view('v_absensi', $data);
+}
+
+public function proses_checkin()
+{
+    $id_user = $this->session->userdata('id_user');
+    if (!$id_user) {
+        echo json_encode(['status' => 'error_sistem', 'message' => 'Sesi login habis, silakan login ulang.']);
+        return;
+    }
+
+    $user = $this->db->get_where('tb_users', ['id_user' => $id_user])->row_array();
+    $today = date('Y-m-d');
+    $yesterday = date('Y-m-d', strtotime('-1 day'));
+
+    if ($user['login_streak'] >= 7 && $user['last_checkin'] == $today) {
+        echo json_encode(['status' => 'completed']);
+        return;
+    }
+
+    if ($user['last_checkin'] == $today) {
+        echo json_encode(['status' => 'already']);
+        return;
+    }
+
+    $new_streak = 1; 
+    if ($user['last_checkin'] == $yesterday) {
+        $new_streak = $user['login_streak'] + 1; 
+    }
+
+    // Reset ke 1 jika streak sudah lebih dari 7 (opsional, agar bisa ulang dari awal)
+    if ($new_streak > 7) $new_streak = 1;
+
+    $this->db->update('tb_users', [
+        'login_streak' => $new_streak,
+        'last_checkin' => $today
+    ], ['id_user' => $id_user]);
+
+    // LOGIKA HADIAH BARU
+    $hadiah = null;
+    if ($new_streak == 1) {
+        $hadiah = 'Kupon Diskon 5%';
+    } elseif ($new_streak == 4) {
+        $hadiah = 'Kupon Diskon 10%';
+    } elseif ($new_streak == 7) {
+        $hadiah = '1 Kopi Gratis';
+    }
+
+    echo json_encode([
+        'status' => 'success',
+        'streak' => $new_streak,
+        'hadiah' => $hadiah
+    ]);
+}
 }
