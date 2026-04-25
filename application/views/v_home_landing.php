@@ -197,7 +197,7 @@
                             🛒 (<?= $total_keranjang; ?>)
                         </a>
                     </li>
-
+                    <li class="nav-item ms-lg-3">
                     <div class="d-flex align-items-center gap-3">
     <?php if($this->session->userdata('id_user')): ?>
         
@@ -207,42 +207,164 @@
         <a href="<?= site_url('Auth'); ?>" class="btn btn-primary btn-sm fw-bold shadow-sm">Login</a>
     <?php endif; ?>
 </div>
+</li>
                 </ul>
             </div>
         </div>
     </nav>
 
-    <section class="hero-section">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-lg-6">
-                    <p class="hero-text-accent mb-3">Est. 2026 — Premium Coffee</p>
-                    <h1 class="hero-title">A Symphony in Every Sip.</h1>
-                    <p class="hero-description">
-                        Selamat datang di kurasi kopi terbaik kami. Tempat di mana setiap biji bercerita tentang dedikasi dan kebahagiaan yang diproses secara presisi.
-                    </p>
-                    
-                    <div class="d-flex gap-3">
-                        <a href="<?= site_url('Home/menu'); ?>" class="btn btn-premium btn-gold shadow-lg">Explore Menu</a>
-                        <a href="<?= site_url('Home/contact_us'); ?>" class="btn btn-premium btn-outline-premium">Get in Touch</a>
-                    </div>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 
-                    <div class="mt-5">
-                        <span class="text-white-50 small">Welcome back, </span>
-                        <span class="fw-bold" style="color: var(--caramel); border-bottom: 1px solid var(--caramel);">
-                            <?= $this->session->userdata('nama'); ?>
-                        </span>
-                    </div>
-                </div>
-                
-                <div class="col-lg-6 text-center">
-                    <div class="image-frame mt-5 mt-lg-0">
-                        <img src="<?= base_url('assets/uploads/kopiku.jpg'); ?>" alt="Premium Coffee" class="hero-img">
-                    </div>
-                </div>
-            </div>
+<style>
+    :root {
+        --espresso: #3e2723;
+        --mocha: #5d4037;
+        --latte: #8d6e63;
+        --cream: #f5f0eb;
+        --white: #ffffff;
+    }
+
+    body {
+        background-color: var(--cream);
+        font-family: 'Poppins', sans-serif;
+        color: var(--espresso);
+        margin: 0;
+        padding: 0;
+    }
+
+    /* Hero Section */
+    .hero-container {
+        min-height: 90vh;
+        display: flex;
+        align-items: center;
+        padding: 100px 7%;
+        overflow: hidden;
+    }
+
+    .hero-content {
+        flex: 1;
+        padding-right: 50px;
+        z-index: 2;
+    }
+
+    .hero-visual {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+    }
+
+    /* Styling Judul */
+    .hero-content h1 {
+        font-family: 'Playfair Display', serif;
+        font-size: 4rem;
+        line-height: 1.1;
+        margin-bottom: 20px;
+        color: var(--espresso);
+    }
+
+    .hero-content p {
+        font-size: 1.1rem;
+        line-height: 1.8;
+        color: var(--mocha);
+        margin-bottom: 35px;
+        max-width: 500px;
+    }
+
+    /* Video Container dengan efek Frame Elegan */
+    .video-frame {
+        position: relative;
+        width: 100%;
+        max-width: 550px;
+        border-radius: 30px;
+        overflow: hidden;
+        box-shadow: 0 25px 50px rgba(62, 39, 35, 0.15);
+        border: 8px solid var(--white);
+        transform: rotate(2deg); /* Sedikit rotasi agar dinamis */
+        transition: transform 0.5s ease;
+    }
+
+    .video-frame:hover {
+        transform: rotate(0deg) scale(1.02);
+    }
+
+    .video-frame video {
+        width: 100%;
+        display: block;
+    }
+
+    /* Button Custom */
+    .btn-coffee {
+        background-color: var(--espresso);
+        color: var(--white);
+        padding: 15px 35px;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: 600;
+        letter-spacing: 1px;
+        transition: all 0.3s ease;
+        display: inline-block;
+        box-shadow: 0 10px 20px rgba(62, 39, 35, 0.2);
+    }
+
+    .btn-coffee:hover {
+        background-color: var(--latte);
+        transform: translateY(-3px);
+        color: var(--white);
+    }
+
+    /* Dekorasi Latar Belakang */
+    .bg-circle {
+        position: absolute;
+        width: 400px;
+        height: 400px;
+        background: var(--latte);
+        opacity: 0.1;
+        border-radius: 50%;
+        top: -100px;
+        right: -100px;
+        z-index: 1;
+    }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+        .hero-container {
+            flex-direction: column;
+            text-align: center;
+            padding-top: 140px;
+        }
+        .hero-content {
+            padding-right: 0;
+            margin-bottom: 50px;
+        }
+        .hero-content h1 {
+            font-size: 3rem;
+        }
+        .hero-content p {
+            margin: 0 auto 30px;
+        }
+        .video-frame {
+            transform: rotate(0deg);
+        }
+    }
+</style>
+
+<div class="hero-container">
+    <div class="bg-circle"></div>
+    
+    <div class="hero-content">
+        <h1>Jejak Rasa,<br>Cerita Dalam Secangkir.</h1>
+        <p>Nikmati harmoni rasa kopi pilihan yang diproses dengan sepenuh hati. Setiap tetesnya adalah perjalanan rasa yang tak terlupakan.</p>
+        <a href="<?= site_url('Home/menu'); ?>" class="btn-coffee">Jelajahi Menu</a>
+    </div>
+
+    <div class="hero-visual">
+        <div class="video-frame">
+            <video autoplay loop muted playsinline>
+                <source src="<?= base_url('assets/uploads/kopigif.mp4'); ?>" type="video/mp4">
+                Browser Anda tidak mendukung video.
+            </video>
         </div>
-    </section>
-
-</body>
-</html>
+    </div>
+</div>
