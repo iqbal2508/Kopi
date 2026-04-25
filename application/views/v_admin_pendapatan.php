@@ -63,54 +63,65 @@
             <div class="card shadow-sm h-100">
                 <div class="card-header bg-white py-3 border-bottom"><h5 class="mb-0 fw-bold text-dark">📊 Riwayat Perhitungan</h5></div>
                 <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover text-center align-middle mb-0">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Bulan</th>
-                                    <th>Modal</th>
-                                    <th>Pendapatan</th>
-                                    <th>Laba Bersih</th>
-                                    <th>Status</th>
-                                    <th>Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php if(empty($riwayat)): ?>
-                                    <tr><td colspan="6" class="py-4 text-muted">Belum ada data.</td></tr>
-                                <?php else: ?>
-                                    <?php foreach($riwayat as $row): ?>
-                                    <tr>
-                                        <td class="fw-bold"><?= $row['bulan']; ?></td>
-                                        <td class="text-danger">Rp <?= number_format($row['modal'], 0, ',', '.'); ?></td>
-                                        <td class="text-primary">Rp <?= number_format($row['pendapatan'], 0, ',', '.'); ?></td>
-                                        <td class="fw-bold">Rp <?= number_format($row['laba_rugi'], 0, ',', '.'); ?></td>
-                                        <td>
-                                            <?php if($row['laba_rugi'] > 0): ?> <span class="badge bg-success px-2 py-1">Untung</span>
-                                            <?php else: ?> <span class="badge bg-danger px-2 py-1">Rugi</span> <?php endif; ?>
-                                        </td>
-                                        <td>
-                                            <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editModal<?= $row['id_keuangan']; ?>">Edit</button>
-                                            <a href="<?= site_url('Admin/hapus_keuangan/'.$row['id_keuangan']); ?>" class="btn btn-sm btn-danger" onclick="return confirm('Hapus data ini?');">Hapus</a>
-                                        </td>
-                                    </tr>
+                <div class="table-responsive">
+    <table class="table table-hover text-center align-middle mb-0">
+        <thead class="table-light">
+            <tr>
+                <th>Bulan</th>
+                <th>Modal</th>
+                <th>Pendapatan</th>
+                <th>Laba Bersih</th>
+                <th>Status</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php if(empty($riwayat)): ?>
+                <tr><td colspan="6" class="py-4 text-muted">Belum ada data.</td></tr>
+            <?php else: ?>
+                <?php foreach($riwayat as $row): ?>
+                <tr>
+                    <td class="fw-bold"><?= $row['bulan']; ?></td>
+                    <td class="text-danger">Rp <?= number_format($row['modal'], 0, ',', '.'); ?></td>
+                    <td class="text-primary">Rp <?= number_format($row['pendapatan'], 0, ',', '.'); ?></td>
+                    <td class="fw-bold">Rp <?= number_format($row['laba_rugi'], 0, ',', '.'); ?></td>
+                    <td>
+                        <?php if($row['laba_rugi'] > 0): ?> <span class="badge bg-success px-2 py-1">Untung</span>
+                        <?php else: ?> <span class="badge bg-danger px-2 py-1">Rugi</span> <?php endif; ?>
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editModal<?= $row['id_keuangan']; ?>">Edit</button>
+                        <a href="<?= site_url('Admin/hapus_keuangan/'.$row['id_keuangan']); ?>" class="btn btn-sm btn-danger" onclick="return confirm('Hapus data ini?');">Hapus</a>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+            <?php endif; ?>
+        </tbody>
+    </table>
+</div>
 
-                                    <div class="modal fade" id="editModal<?= $row['id_keuangan']; ?>" tabindex="-1">
-                                        <div class="modal-dialog">
-                                            <form class="modal-content text-start" action="<?= site_url('Admin/edit_keuangan'); ?>" method="post">
-                                                <div class="modal-header"><h5 class="modal-title">Edit Bulan <?= $row['bulan']; ?></h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-                                                <div class="modal-body">
-                                                    <input type="hidden" name="id_keuangan" value="<?= $row['id_keuangan']; ?>">
-                                                    <div class="mb-2"><label>Bulan</label><input type="month" name="bulan" class="form-control" value="<?= $row['bulan']; ?>" required></div>
-                                                    <div class="mb-2"><label>Modal</label><input type="number" name="modal" class="form-control" value="<?= $row['modal']; ?>" required></div>
-                                                    <div class="mb-2"><label>Pendapatan</label><input type="number" name="pendapatan" class="form-control" value="<?= $row['pendapatan']; ?>" required></div>
-                                                </div>
-                                                <div class="modal-footer"><button type="submit" class="btn btn-success">Simpan Perubahan</button></div>
-                                            </form>
-                                        </div>
-                                    </div>
-                                    <?php endforeach; ?>
-                                <?php endif; ?>
+<?php if(!empty($riwayat)): ?>
+    <?php foreach($riwayat as $row): ?>
+    <div class="modal fade" id="editModal<?= $row['id_keuangan']; ?>" tabindex="-1">
+        <div class="modal-dialog">
+            <form class="modal-content text-start" action="<?= site_url('Admin/edit_keuangan'); ?>" method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Bulan <?= $row['bulan']; ?></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="id_keuangan" value="<?= $row['id_keuangan']; ?>">
+                    <div class="mb-2"><label>Bulan</label><input type="month" name="bulan" class="form-control" value="<?= $row['bulan']; ?>" required></div>
+                    <div class="mb-2"><label>Modal</label><input type="number" name="modal" class="form-control" value="<?= $row['modal']; ?>" required></div>
+                    <div class="mb-2"><label>Pendapatan</label><input type="number" name="pendapatan" class="form-control" value="<?= $row['pendapatan']; ?>" required></div>
+                </div>
+                <div class="modal-footer"><button type="submit" class="btn btn-success">Simpan Perubahan</button></div>
+            </form>
+        </div>
+    </div>
+    <?php endforeach; ?>
+<?php endif; ?>
+                                
                             </tbody>
                         </table>
                     </div>

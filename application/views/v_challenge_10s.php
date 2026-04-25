@@ -31,7 +31,7 @@
                 <button id="btnStart" class="btn-start shadow">MULAI GAME</button>
                 <button id="btnStop" class="btn-stop shadow d-none">STOP!</button>
             <?php else: ?>
-                <div class="alert alert-danger d-inline-block px-5 py-4 mt-4" style="border-radius: 20px; background: #4A2C2A;">
+                <div class="alert alert-danger d-inline-block px-5 py-4 mt-4" style="border-radius: 20px; background: white;">
                     <h4 class="fw-bold">Jatah Kamu Habis!</h4>
                     <p class="mb-0">Coba keberuntunganmu di game lain atau kumpulkan kupon.</p>
                 </div>

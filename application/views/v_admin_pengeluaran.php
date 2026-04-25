@@ -45,47 +45,72 @@
         <div class="col-md-8 mb-4">
             <div class="card shadow-sm h-100">
                 <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover text-center align-middle mb-0">
-                            <thead class="table-dark">
-                                <tr>
-                                    <th>Tanggal</th>
-                                    <th class="text-start">Nama Barang</th>
-                                    <th>Harga</th>
-                                    <th>Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php if(empty($pengeluaran)): ?>
-                                    <tr><td colspan="4" class="py-4">Belum ada catatan belanja.</td></tr>
-                                <?php else: ?>
-                                    <?php foreach($pengeluaran as $row): ?>
-                                    <tr>
-                                        <td><?= date('d-m-Y', strtotime($row['tanggal'])); ?></td>
-                                        <td class="text-start"><?= $row['nama_barang']; ?></td>
-                                        <td class="text-danger fw-bold">Rp <?= number_format($row['harga'], 0, ',', '.'); ?></td>
-                                        <td>
-                                            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editModal<?= $row['id_pengeluaran']; ?>">Edit</button>
-                                            <a href="<?= site_url('Admin/hapus_belanja/'.$row['id_pengeluaran']); ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Hapus barang ini?');">Hapus</a>
-                                        </td>
-                                    </tr>
+                <div class="table-responsive">
+    <table class="table table-hover text-center align-middle mb-0">
+        <thead class="table-light">
+            <tr>
+                <th>Tanggal</th>
+                <th>Nama Barang</th>
+                <th>Harga</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php if(empty($pengeluaran)): ?>
+                <tr><td colspan="4" class="py-4 text-muted">Belum ada catatan belanja.</td></tr>
+            <?php else: ?>
+                <?php foreach($pengeluaran as $row): ?>
+                <tr>
+                    <td class="fw-bold"><?= $row['tanggal']; ?></td>
+                    <td><?= $row['nama_barang']; ?></td>
+                    <td class="text-danger">Rp <?= number_format($row['harga'], 0, ',', '.'); ?></td>
+                    <td>
+                        <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editModal<?= $row['id_pengeluaran']; ?>">Edit</button>
+                        <a href="<?= site_url('Admin/hapus_belanja/'.$row['id_pengeluaran']); ?>" class="btn btn-sm btn-danger" onclick="return confirm('Hapus catatan ini?');">Hapus</a>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+            <?php endif; ?>
+        </tbody>
+    </table>
+</div>
 
-                                    <div class="modal fade" id="editModal<?= $row['id_pengeluaran']; ?>" tabindex="-1">
-                                        <div class="modal-dialog">
-                                            <form class="modal-content text-start" action="<?= site_url('Admin/edit_belanja'); ?>" method="post">
-                                                <div class="modal-header"><h5 class="modal-title">Edit Belanjaan</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-                                                <div class="modal-body">
-                                                    <input type="hidden" name="id_pengeluaran" value="<?= $row['id_pengeluaran']; ?>">
-                                                    <div class="mb-2"><label>Tanggal</label><input type="date" name="tanggal" class="form-control" value="<?= $row['tanggal']; ?>" required></div>
-                                                    <div class="mb-2"><label>Nama Barang</label><input type="text" name="nama_barang" class="form-control" value="<?= $row['nama_barang']; ?>" required></div>
-                                                    <div class="mb-2"><label>Harga</label><input type="number" name="harga" class="form-control" value="<?= $row['harga']; ?>" required></div>
-                                                </div>
-                                                <div class="modal-footer"><button type="submit" class="btn btn-success">Simpan Perubahan</button></div>
-                                            </form>
-                                        </div>
-                                    </div>
-                                    <?php endforeach; ?>
-                                <?php endif; ?>
+<?php if(!empty($pengeluaran)): ?>
+    <?php foreach($pengeluaran as $row): ?>
+    <div class="modal fade" id="editModal<?= $row['id_pengeluaran']; ?>" tabindex="-1">
+        <div class="modal-dialog">
+            <form class="modal-content text-start" action="<?= site_url('Admin/edit_belanja'); ?>" method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Belanja</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="id_pengeluaran" value="<?= $row['id_pengeluaran']; ?>">
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Tanggal</label>
+                        <input type="date" name="tanggal" class="form-control" value="<?= $row['tanggal']; ?>" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Nama Barang</label>
+                        <input type="text" name="nama_barang" class="form-control" value="<?= $row['nama_barang']; ?>" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Harga</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light">Rp</span>
+                            <input type="number" name="harga" class="form-control" value="<?= $row['harga']; ?>" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success fw-bold">Simpan Perubahan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <?php endforeach; ?>
+<?php endif; ?>
                             </tbody>
                         </table>
                     </div>
