@@ -8,64 +8,82 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
-        /* TEMA KOPI PREMIUM (UI/UX Custom) */
+        /* TEMA KOPI ELEGAN & CREAMY (UI/UX Custom) */
         body {
             font-family: 'Poppins', sans-serif;
-            background-color: #F8F5F2; /* Warna dasar krem latte */
-            color: #33211D;
+            background-color: #FDF8F5; /* Warna dasar creamy warm */
+            color: #4A3324; /* Teks warna kopi pekat agar tetap terbaca jelas */
         }
         
-        /* Navbar Espresso */
+        /* Navbar Latte */
         .navbar-coffee {
-            background-color: #4A2C2A !important; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            background-color: #C39873 !important; /* Warna cokelat latte/karamel yang cerah */
+            box-shadow: 0 4px 15px rgba(195, 152, 115, 0.2);
         }
         
+        /* Tombol Navbar Kustom */
+        .navbar-coffee .btn-outline-light {
+            border-color: #FAF4F0;
+            color: #FAF4F0;
+            transition: all 0.3s ease;
+        }
+        .navbar-coffee .btn-outline-light:hover {
+            background-color: #FAF4F0;
+            color: #C39873;
+        }
+
         /* Card & Layout */
         .card-custom {
             border-radius: 16px;
-            border: none;
-            box-shadow: 0 8px 24px rgba(74, 44, 42, 0.08);
+            border: 1px solid #F0E6D9; /* Border krem tipis */
+            background-color: #FFFFFF;
+            box-shadow: 0 10px 30px rgba(139, 94, 60, 0.06); /* Bayangan cokelat sangat lembut */
         }
         
-        /* Modifikasi Tabel */
+        /* Modifikasi Tabel Creamy */
         .table-coffee thead th {
-            background-color: #6F4E37 !important; /* Warna mocha */
-            color: #ffffff !important;
-            font-weight: 500;
+            background-color: #EAD8C3 !important; /* Warna creamy beige */
+            color: #5C3D2E !important; /* Teks cokelat tua elegan */
+            font-weight: 600;
             border-bottom: none;
-            padding: 12px;
+            padding: 14px;
         }
         .table-hover tbody tr:hover {
-            background-color: #FDFBF9;
+            background-color: #FCF9F5; /* Efek hover sangat terang */
         }
         .table td {
             vertical-align: middle;
-            border-color: #EAE0D5;
+            border-color: #F0E6D9;
+            color: #5C3D2E;
         }
 
         /* Tombol Aksi Kustom */
         .btn-caramel {
-            background-color: #C08261;
+            background-color: #D4A373; /* Karamel lembut */
             color: white;
             border: none;
             border-radius: 8px;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
         }
         .btn-caramel:hover {
-            background-color: #A0694A;
+            background-color: #BC8A5B;
             color: white;
-            transform: translateY(-1px);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(212, 163, 115, 0.3);
         }
+
         .btn-add-pos {
-            background-color: #79ac78;
+            background-color: #8C6A53; /* Warna cokelat susu elegan (tidak hijau lagi) */
             color: white;
             border-radius: 8px;
             border: none;
+            transition: all 0.3s ease;
         }
         .btn-add-pos:hover {
-            background-color: #618a60;
+            background-color: #6F513D;
             color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(140, 106, 83, 0.3);
         }
 
         /* Badge Kustom */
@@ -75,8 +93,8 @@
             border-radius: 6px;
         }
         .badge-offline {
-            background-color: #EAE0D5;
-            color: #6F4E37;
+            background-color: #F0E6D9;
+            color: #8C6A53;
         }
     </style>
 </head>
@@ -84,7 +102,7 @@
 
     <nav class="navbar navbar-expand-lg navbar-dark navbar-coffee py-3 mb-4">
         <div class="container-fluid px-4">
-            <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="#">
+            <a class="navbar-brand fw-bold d-flex align-items-center gap-2 text-white" href="#">
                 <span style="font-size: 1.5rem;">☕</span> POS Kasir - Jejak Rasa
             </a>
             <div class="d-flex align-items-center gap-3">
@@ -93,7 +111,7 @@
                 <a href="<?= site_url('Admin/laporan'); ?>" class="btn btn-outline-light btn-sm rounded-pill px-3">📊 Laporan</a>
                 <a href="<?= site_url('Admin/pendapatan'); ?>" class="btn btn-outline-light btn-sm rounded-pill px-3">Pendapatan</a>
                 
-                <div class="border-start border-secondary mx-2" style="height: 24px;"></div>
+                <div class="border-start border-light opacity-50 mx-2" style="height: 24px;"></div>
                 
                 <span class="text-white opacity-75 small">Halo, Admin</span>
                 <a href="<?= site_url('Auth/logout'); ?>" class="btn btn-danger btn-sm rounded-pill px-3 fw-bold shadow-sm">Keluar</a>
@@ -104,7 +122,7 @@
     <div class="container-fluid px-4 pb-5">
         <div class="d-flex justify-content-between align-items-end mb-4">
             <div>
-                <h3 class="fw-bold mb-1">Daftar Pesanan Masuk</h3>
+                <h3 class="fw-bold mb-1" style="color: #4A3324;">Daftar Pesanan Masuk</h3>
                 <p class="text-muted small mb-0">Pantau dan kelola pesanan pelanggan dari web maupun offline.</p>
             </div>
             <a href="<?= site_url('Admin/pos'); ?>" class="btn btn-add-pos fw-bold px-4 py-2 shadow-sm">
@@ -136,7 +154,7 @@
                                 <td class="text-muted small"><?= date('d M Y, H:i', strtotime($trx['tgl_transaksi'])); ?></td>
                                 
                                 <td class="fw-bold">
-                                    <a href="<?= site_url('Admin/detail/'.$trx['id_transaksi']); ?>" style="color: #C08261; text-decoration: none;">
+                                    <a href="<?= site_url('Admin/detail/'.$trx['id_transaksi']); ?>" style="color: #C39873; text-decoration: none;">
                                         <?= $trx['id_transaksi']; ?>
                                     </a>
                                 </td>
@@ -145,12 +163,12 @@
                                     <?php if($trx['id_user'] == 0): ?>
                                         <span class="badge badge-status badge-offline">Pelanggan Kasir</span>
                                     <?php else: ?>
-                                        <span class="fw-bold" style="color: #4A2C2A;"><?= $trx['nama_lengkap']; ?></span>
+                                        <span class="fw-bold" style="color: #5C3D2E;"><?= $trx['nama_lengkap']; ?></span>
                                     <?php endif; ?>
                                 </td>
 
                                 <td>
-                                    <span class="badge bg-light text-dark border badge-status"><?= $trx['tipe_pesanan']; ?></span>
+                                    <span class="badge bg-light text-dark border badge-status" style="border-color: #F0E6D9 !important;"><?= $trx['tipe_pesanan']; ?></span>
                                 </td>
                                 
                                 <td class="fw-bold" style="color: #D25345;">Rp <?= number_format($trx['total_bayar'], 0, ',', '.'); ?></td>
