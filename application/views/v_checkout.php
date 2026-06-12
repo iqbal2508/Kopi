@@ -99,7 +99,7 @@
                             <label class="form-label fw-bold">Tipe Pesanan</label>
                             <select name="tipe_pesanan" class="form-select" required>
                                 <option value="Di Antar">Di Antar (Ojek / Kurir)</option>
-                                <option value="Datang ke Rumah">Datang ke Rumah (Ambil Sendiri)</option>
+                                <option value="Datang ke Toko">Datang ke Toko (Ambil Sendiri)</option>
                             </select>
                         </div>
                         
@@ -170,7 +170,7 @@
 
             if (tipePesanan === 'Di Antar' && metodePembayaran === 'Bayar di Tempat') {
                 e.preventDefault(); 
-                alert('Maaf, pesanan yang di antar menggunakan ojek/kurir wajib dibayar di awal (QRIS/Transfer). Bayar di tempat hanya berlaku jika Anda datang ke rumah.');
+                alert('Maaf, pesanan yang di antar menggunakan ojek/kurir wajib dibayar di awal (QRIS/Transfer). Bayar di tempat hanya berlaku jika Anda datang ke toko.');
                 return; 
             }
 

@@ -57,21 +57,20 @@
             <div class="col-md-4">
                 <div class="card p-3 shadow-sm bg-espresso rounded">
                     <h6>💰 Omset Bulan Ini</h6>
-                    <h3 id="txt-omset">Rp 4.250.000</h3>
+                    <h3 id="txt-omset">
+                    <h3 id="txt-omset">
+Rp <?= number_format($omset,0,',','.') ?>
+</h3>
                     <small class="text-white-50">Meningkat 12% dari bulan lalu</small>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="card p-3 shadow-sm bg-mocha rounded">
-                    <h6>☕ Total Kopi Terjual</h6>
-                    <h3 id="txt-terjual">185 Cup</h3>
-                    <small class="text-white-50">Menu terlaris: Es Kopi Susu Latte</small>
-                </div>
-            </div>
+           
             <div class="col-md-4">
                 <div class="card p-3 shadow-sm bg-latte rounded">
                     <h6>👥 Transaksi Pelanggan</h6>
-                    <h3 id="txt-transaksi">42 Transaksi</h3>
+                    <h3 id="txt-transaksi">
+<?= $transaksi ?> Transaksi
+</h3>
                     <small class="text-white-50">Rata-rata rating kepuasan: 4.8/5</small>
                 </div>
             </div>
@@ -95,10 +94,10 @@
         const salesChart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni'],
-                datasets: [{
-                    label: 'Pendapatan Penjualan (Rp)',
-                    data: [1800000, 2400000, 2100000, 3500000, 3900000, 4250000],
+               labels: <?= $labels; ?>,
+datasets: [{
+    label: 'Pendapatan Penjualan (Rp)',
+    data: <?= $total; ?>,
                     backgroundColor: 'rgba(93, 64, 55, 0.2)',
                     borderColor: '#3e2723',
                     borderWidth: 3,

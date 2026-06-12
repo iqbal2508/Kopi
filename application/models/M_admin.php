@@ -168,4 +168,18 @@ public function get_total_pendapatan_bulan($bulan) {
     $hasil = $this->db->get('tb_transaksi')->row_array();
     return $hasil['total_bayar'] ? $hasil['total_bayar'] : 0;
 }
+
+public function get_grafik_penjualan()
+{
+    $this->db->select("
+        DATE(tgl_transaksi) as tanggal,
+        SUM(total_bayar) as total
+    ");
+    $this->db->from('tb_transaksi');
+    $this->db->where('status_pesanan', 'Selesai');
+    $this->db->group_by('DATE(tgl_transaksi)');
+    $this->db->order_by('tgl_transaksi', 'ASC');
+
+    return $this->db->get()->result_array();
+}
 }

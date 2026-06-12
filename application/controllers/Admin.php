@@ -182,6 +182,8 @@ class Admin extends CI_Controller {
 
     // 5. LAPORAN & SOFT DELETE
     public function laporan() {
+        $data['omset'] = $this->M_admin->get_total_pendapatan();
+$data['transaksi'] = count($this->M_admin->get_laporan());
         $data['title'] = "Laporan Penjualan - Jejak Rasa Kopi";
         $data['laporan'] = $this->M_admin->get_laporan();
         $data['total_pendapatan'] = $this->M_admin->get_total_pendapatan();
@@ -330,11 +332,27 @@ public function edit_belanja() {
     redirect('Admin/belanja');
 }
 
-public function grafik_penjualan() {
-    // Judul yang akan dikirimkan ke tag <title>
+public function grafik_penjualan()
+{
     $data['title'] = 'Grafik Analisis Penjualan Kopi';
-    
-    // Panggil view grafik penjualan yang baru saja dibuat
+
+    $grafik = $this->M_admin->get_grafik_penjualan();
+
+    $labels = [];
+    $total = [];
+
+    foreach($grafik as $row)
+    {
+        $labels[] = date('d-m-Y', strtotime($row['tanggal']));
+        $total[] = (int)$row['total'];
+    }
+
+    $data['labels'] = json_encode($labels);
+    $data['total'] = json_encode($total);
+
+    $data['omset'] = $this->M_admin->get_total_pendapatan();
+    $data['transaksi'] = count($this->M_admin->get_laporan());
+
     $this->load->view('v_admin_grafik_penjualan', $data);
 }
 }
