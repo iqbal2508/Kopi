@@ -95,9 +95,17 @@
                 </table>
             </div>
 
-            <div class="text-end mt-5 d-print-none">
-                <button onclick="window.print()" class="btn btn-lg fw-bold px-5 text-white" style="background-color: #4A2C2A;">🖨️ Cetak Laporan (Print)</button>
-            </div>
+            <div class="d-flex justify-content-end gap-3 mt-5 d-print-none">
+    <a href="<?= site_url('Admin/grafik_penjualan'); ?>" class="btn fw-bold px-4 py-2 shadow-sm d-flex align-items-center" style="background-color: #5D4037; color: #ffffff; border: none;">
+        📊 Lihat Grafik Penjualan
+    </a>
+    
+    <button onclick="window.print()" class="btn fw-bold px-4 py-2 shadow-sm text-white d-flex align-items-center" style="background-color: #4A2C2A; border: none;">
+        🖨️ Cetak Laporan (Print)
+    </button>
+</div>
+
+            
 
         </div>
     </div>

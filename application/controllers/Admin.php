@@ -329,4 +329,12 @@ public function edit_belanja() {
     $this->session->set_flashdata('pesan', '<div class="alert alert-success">Catatan berhasil diubah!</div>');
     redirect('Admin/belanja');
 }
+
+public function grafik_penjualan() {
+    // Judul yang akan dikirimkan ke tag <title>
+    $data['title'] = 'Grafik Analisis Penjualan Kopi';
+    
+    // Panggil view grafik penjualan yang baru saja dibuat
+    $this->load->view('v_admin_grafik_penjualan', $data);
+}
 }
