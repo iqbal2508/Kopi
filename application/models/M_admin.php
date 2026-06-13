@@ -23,10 +23,16 @@ class M_admin extends CI_Model {
         $this->db->update('tb_transaksi', array('status_pesanan' => $status_baru));
     }
     // Mengambil data 1 transaksi spesifik untuk detail
+    // Mengambil data 1 transaksi spesifik untuk detail
     public function get_transaksi_by_id($id_transaksi) {
-     $this->db->where('id_transaksi', $id_transaksi);
-     return $this->db->get('tb_transaksi')->row_array();
- }
+        // Hapus tb_users.alamat, karena data provinsi dan kota sudah otomatis 
+        // terambil dari tb_transaksi.*
+        $this->db->select('tb_transaksi.*, tb_users.nama_lengkap'); 
+        $this->db->from('tb_transaksi');
+        $this->db->join('tb_users', 'tb_transaksi.id_user = tb_users.id_user', 'left');
+        $this->db->where('tb_transaksi.id_transaksi', $id_transaksi);
+        return $this->db->get()->row_array();
+    }
 
  // Mengambil rincian kopi apa saja di dalam transaksi tersebut
  public function get_detail_transaksi($id_transaksi) {

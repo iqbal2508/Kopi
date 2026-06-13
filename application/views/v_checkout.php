@@ -97,7 +97,7 @@
 
                         <div class="mb-3">
                             <label class="form-label fw-bold">Tipe Pesanan</label>
-                            <select name="tipe_pesanan" class="form-select" required>
+                            <select name="tipe_pesanan" id="tipe_pesanan" class="form-select" required>
                                 <option value="Di Antar">Di Antar (Ojek / Kurir)</option>
                                 <option value="Datang ke Toko">Datang ke Toko (Ambil Sendiri)</option>
                             </select>
@@ -112,39 +112,46 @@
                             </select>
                         </div>
 
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Provinsi</label>
-                            <select name="provinsi" id="provinsi" class="form-select" required>
-                                <option value="">-- Pilih Provinsi --</option>
-                                <option value="DKI Jakarta">DKI Jakarta</option>
-                                <option value="Jawa Barat">Jawa Barat</option>
-                                <option value="Banten">Banten</option>
-                                <option value="Luar Jabodetabek">Lainnya (Luar Jabodetabek)</option>
-                            </select>
-                        </div>
+                        <div id="wadahPengiriman">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Provinsi</label>
+                                <select name="provinsi" id="provinsi" class="form-select" required>
+                                    <option value="">-- Pilih Provinsi --</option>
+                                    <option value="DKI Jakarta">DKI Jakarta</option>
+                                    <option value="Jawa Barat">Jawa Barat</option>
+                                    <option value="Banten">Banten</option>
+                                    <option value="Luar Jabodetabek">Lainnya (Luar Jabodetabek)</option>
+                                </select>
+                            </div>
 
-                        <div class="mb-4">
-                            <label class="form-label fw-bold">Kota / Kabupaten</label>
-                            <select name="kota" id="kota" class="form-select" required>
-                                <option value="">-- Pilih Kota --</option>
-                                <optgroup label="DKI Jakarta">
-                                    <option value="Jakarta Barat">Jakarta Barat</option>
-                                    <option value="Jakarta Pusat">Jakarta Pusat</option>
-                                    <option value="Jakarta Selatan">Jakarta Selatan</option>
-                                    <option value="Jakarta Timur">Jakarta Timur</option>
-                                    <option value="Jakarta Utara">Jakarta Utara</option>
-                                </optgroup>
-                                <optgroup label="Bodetabek">
-                                    <option value="Bogor">Bogor</option>
-                                    <option value="Depok">Depok</option>
-                                    <option value="Tangerang">Tangerang</option>
-                                    <option value="Tangerang Selatan">Tangerang Selatan</option>
-                                    <option value="Bekasi">Bekasi</option>
-                                </optgroup>
-                                <optgroup label="Lainnya">
-                                    <option value="Luar Jangkauan">Luar Jangkauan</option>
-                                </optgroup>
-                            </select>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Kota / Kabupaten</label>
+                                <select name="kota" id="kota" class="form-select" required>
+                                    <option value="">-- Pilih Kota --</option>
+                                    <optgroup label="DKI Jakarta">
+                                        <option value="Jakarta Barat">Jakarta Barat</option>
+                                        <option value="Jakarta Pusat">Jakarta Pusat</option>
+                                        <option value="Jakarta Selatan">Jakarta Selatan</option>
+                                        <option value="Jakarta Timur">Jakarta Timur</option>
+                                        <option value="Jakarta Utara">Jakarta Utara</option>
+                                    </optgroup>
+                                    <optgroup label="Bodetabek">
+                                        <option value="Bogor">Bogor</option>
+                                        <option value="Depok">Depok</option>
+                                        <option value="Tangerang">Tangerang</option>
+                                        <option value="Tangerang Selatan">Tangerang Selatan</option>
+                                        <option value="Bekasi">Bekasi</option>
+                                    </optgroup>
+                                    <optgroup label="Lainnya">
+                                        <option value="Luar Jangkauan">Luar Jangkauan</option>
+                                    </optgroup>
+                                </select>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">Detail Alamat Lengkap</label>
+                                <textarea name="detail_alamat" id="detail_alamat" class="form-control" rows="3" placeholder="Masukkan nama jalan, RT/RW, kelurahan, kecamatan, nomor rumah, dan patokan (contoh: rumah pagar hitam sebelah warung makan)" required></textarea>
+                            </div>
                         </div>
 
                         <button type="submit" class="btn w-100 fw-bold py-3 text-white" style="background-color: #6F4E37; border-radius: 10px;">
@@ -158,11 +165,31 @@
 
     <script>
         const formCheckout = document.querySelector('form'); 
+        const tipePesananSelect = document.getElementById('tipe_pesanan');
+        const wadahPengiriman = document.getElementById('wadahPengiriman');
+        const inputProvinsi = document.getElementById('provinsi');
+        const inputKota = document.getElementById('kota');
+        const inputDetailAlamat = document.getElementById('detail_alamat');
+
+        // Dinamis menghilangkan/menampilkan alamat jika user memilih 'Datang ke Toko'
+        tipePesananSelect.addEventListener('change', function() {
+            if (this.value === 'Datang ke Toko') {
+                wadahPengiriman.style.display = 'none';
+                inputProvinsi.removeAttribute('required');
+                inputKota.removeAttribute('required');
+                inputDetailAlamat.removeAttribute('required');
+            } else {
+                wadahPengiriman.style.display = 'block';
+                inputProvinsi.setAttribute('required', 'required');
+                inputKota.setAttribute('required', 'required');
+                inputDetailAlamat.setAttribute('required', 'required');
+            }
+        });
 
         formCheckout.addEventListener('submit', function(e) {
-            let prov = document.getElementById('provinsi').value;
-            let kota = document.getElementById('kota').value;
-            let tipePesanan = document.querySelector('select[name="tipe_pesanan"]').value;
+            let prov = inputProvinsi.value;
+            let kota = inputKota.value;
+            let tipePesanan = tipePesananSelect.value;
             let metodePembayaran = document.querySelector('select[name="metode_pembayaran"]').value;
             let totalBelanja = <?= isset($total_belanja) ? $total_belanja : 0; ?>; 
             
@@ -174,7 +201,7 @@
                 return; 
             }
 
-            if (prov !== 'DKI Jakarta') {
+            if (tipePesanan === 'Di Antar' && prov !== 'DKI Jakarta') {
                 if (kotaBodetabek.includes(kota)) {
                     if (totalBelanja < 30000) {
                         e.preventDefault();
@@ -204,7 +231,6 @@
             let diskon = 0;
             let namaPromo = "";
 
-            // Sembunyikan pilihan kopi gratis by default
             wadahKopiGratis.classList.add('d-none');
 
             if(tipe === "5") {
@@ -223,22 +249,18 @@
                 diskon = 10000;
                 namaPromo = "Potongan 10Rb (Game)";
             } else if(tipe === "free" || tipe === "game_Kopi Gratis") {
-                // Munculkan kembali wadah pilihan kopi jika jenis vouchernya "Gratis"
                 wadahKopiGratis.classList.remove('d-none');
                 namaPromo = "1 Kopi Gratis";
                 
-                // Ambil harga dari kopi yang sedang dipilih di dropdown kedua
                 if(kopiGratisSelect && kopiGratisSelect.options.length > 0) {
                     diskon = parseInt(kopiGratisSelect.options[kopiGratisSelect.selectedIndex].getAttribute('data-harga'));
                 }
             }
 
-            // Cegah agar diskon tidak membuat harga minus
             if(diskon > totalAwal) diskon = totalAwal;
             
             let totalAkhir = totalAwal - diskon;
 
-            // Update UI Interface
             if(diskon > 0) {
                 barisDiskon.style.setProperty('display', 'flex', 'important');
                 labelDiskon.innerText = "🎁 " + namaPromo;
@@ -250,15 +272,12 @@
             teksTotal.innerText = "Rp " + totalAkhir.toLocaleString('id-ID');
         }
 
-        // Jalankan fungsi ketika opsi voucher diganti
         pilihVoucher.addEventListener('change', hitungDiskonVoucher);
         
-        // Jalankan fungsi ketika kopi gratis yang dipilih diganti (agar harga potongan update)
         if(kopiGratisSelect) {
             kopiGratisSelect.addEventListener('change', hitungDiskonVoucher);
         }
 
-        // Panggil 1 kali saat pertama kali load, agar total pembayaran muncul.
         hitungDiskonVoucher();
     </script>
 

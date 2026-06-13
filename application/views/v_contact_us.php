@@ -127,7 +127,7 @@
         <div class="contact-info-list">
             <div class="contact-item">
                 <span class="contact-label">Alamat</span>
-                <span class="contact-value">Jl. Thalib 3 Dalam No 5</span>
+                <span class="contact-value">Jl.Skip No.24 RT O7 RW 06 . Matraman, Utan Kayu Selatan , Jakarta Timur</span>
             </div>
 
             <div class="contact-item">

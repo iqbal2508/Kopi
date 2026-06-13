@@ -223,6 +223,13 @@
                                 <span class="text-muted small">Tipe Pesanan</span>
                                 <span class="fw-medium text-dark small"><?= $r['tipe_pesanan']; ?></span>
                             </div>
+                            <div class="mb-2">
+        <span class="text-muted small d-block">Alamat Toko</span>
+        <span class="fw-medium text-dark small d-block">
+            Jl. Skip No. 24 RT 07 RW 06, Utan Kayu Selatan,
+            Matraman, Jakarta Timur
+        </span>
+    </div>
                             <div class="d-flex justify-content-between mb-2">
                                 <span class="text-muted small">Pembayaran</span>
                                 <span class="fw-medium text-dark small"><?= $r['metode_pembayaran']; ?></span>
